@@ -14,8 +14,8 @@ const ViewCustomerTransactions = () => {
 
   const retrieveAllTransactions = async () => {
     try {
-      const response = await getAllTransactions(100001);
-      console.log("response", response);
+      const response = await getAllTransactions(100000);
+      console.log("All transaction of account", response);
       
         return response; 
     } catch (error) {
