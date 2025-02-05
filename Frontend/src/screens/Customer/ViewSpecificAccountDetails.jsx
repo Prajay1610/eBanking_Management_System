@@ -1,37 +1,131 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Footer from "../../components/layouts/Footer/Footer";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link, useParams } from "react-router-dom"; // Import Link from react-router-dom
 import Header from "../../components/layouts/Header/Header";
+import { getAllSpecificAccountTransactions, getAllTransactions, getCustomerAccountData, getCustomerData } from "../../services/customerService";
+import { getBankAccountDetails } from "../../services/bankManagerService";
+import { toast } from "react-toastify";
 
 const ViewSpecificAccountDetails = () => {
   // Sample data for transactions
-  const transactions = [
-    {
-      date: "15-Dec-2024",
-      description: "Online Shopping",
-      amount: "-Rs. 100.00",
-      type: "Debit",
-    },
-    {
-      date: "12-Dec-2024",
-      description: "Salary Credit",
-      amount: "+Rs. 2000.00",
-      type: "Credit",
-    },
-    {
-      date: "10-Dec-2024",
-      description: "Electricity Bill",
-      amount: "- Rs. 75.00",
-      type: "Debit",
-    },
-  ];
+  const { customerId ,accountId} = useParams(); // Get IDs from URL
+  const [customerData, setCustomerData] = useState({}); // State for customer data
+  const [accountsData, setAccountsData] = useState({}); // State for customer data
+  const [loading, setLoading] = useState(true); // State for loading
+  const [allTransactions, setAllTransactions] = useState([]);
+
+  const fetchCustomerData = async () => {
+   
+    try {
+      console.log("i am in cust data");
+      const data = await getCustomerData(customerId);
+      
+      setCustomerData(data); // Store fetched data
+    } catch (error) {
+      console.error("Error fetching customer data:", error);
+    } finally {
+      setLoading(false); // Stop loading once done
+    }
+  };
+
+
+  useEffect(() => {
+    fetchCustomerData();
+  }, []);
+
+
+  const fetchAccountData = async () => {
+    try {
+
+      
+      const data = await getBankAccountDetails(accountId);
+    
+     
+      if (data) {
+        setAccountsData(data || []); // Always keep last 3 transactions
+      }
+    } catch (error) {
+      console.error("Error fetching customer data:", error);
+    } finally {
+      setLoading(false); // Stop loading once done
+    }
+  };
+  useEffect(() => {
+
+    fetchAccountData();
+  }, [customerId]);
+
+
+  const retrieveAllTransactions = async () => {
+      try {
+        const response = await getAllSpecificAccountTransactions(accountId);
+        console.log("response", response);
+        
+          return response; 
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        toast.error("Failed to fetch transactions. Please try again.");
+        return null;
+      }
+    };
+
+  useEffect(() => {
+    const getAllTransactions = async (customerId) => {
+      const transactions = await retrieveAllTransactions(customerId);
+      if (transactions) {
+        setAllTransactions(transactions || []);
+      }
+    };
+    getAllTransactions(customerId);
+  }, []);
+
+ 
 
   const accounts = [
     { type: "Savings" },
     //{ type: "Current" },
   ];
-
+  const formatDateFromEpoch = (epochTime) => {
+    const date = new Date(Number(epochTime));
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(2); // Get last 2 digits of the year
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // Determine AM or PM
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12; // Convert to 12-hour format
+    hours = hours ? String(hours).padStart(2, '0') : '12'; // The hour '0' should be '12' in 12-hour format
+    
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+    
+    return formattedDate;
+  };
+  const formatDateFromEpochForCreatedOn = (epochTime) => {
+    const date = new Date(epochTime);
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(2); // Get last 2 digits of the year
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // Determine AM or PM
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12; // Convert to 12-hour format
+    hours = hours ? String(hours).padStart(2, '0') : '12'; // The hour '0' should be '12' in 12-hour format
+    
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+    
+    return formattedDate;
+  };
+  
+  
   return (
     <>
       <Header />
@@ -61,19 +155,19 @@ const ViewSpecificAccountDetails = () => {
                         </i>
                       </li>
                       <li className="list-group-item">
-                        <strong>Customer Name :</strong> User1
+                        <strong>Customer Name : </strong>{customerData.name}
                       </li>
                       <li className="list-group-item">
-                        <strong>Customer Email :</strong> User1@gmail.com
+                        <strong>Customer Email :</strong> {customerData.email}
                       </li>
                       <li className="list-group-item">
-                        <strong>Gender :</strong> Male
+                        <strong>Gender :</strong> {customerData.gender}
                       </li>
                       <li className="list-group-item">
-                        <strong>Phone No :</strong> 9876447560
+                        <strong>Phone No :</strong> {customerData.contactNo}
                       </li>
                       <li className="list-group-item">
-                        <strong>Address : </strong>Pune,Maharashtra
+                        <strong>Address : </strong>{customerData.address}
                       </li>
                     </ul>
                   </div>
@@ -88,30 +182,30 @@ const ViewSpecificAccountDetails = () => {
                         </i>
                       </li>
                       <li className="list-group-item">
-                        <strong>Bank Name : </strong>State Bank of India
+                        <strong>Bank Name : </strong> {accountsData.bankName}
                       </li>
                       <li className="list-group-item">
-                        <strong>Ifsc code : </strong>1034123412
-                      </li>
-
-                      <li className="list-group-item">
-                        <strong>Account No : </strong>1034123412
+                        <strong>Ifsc code : </strong> {accountsData.ifscCode}
                       </li>
 
                       <li className="list-group-item">
-                        <strong>Balance : </strong>1034123412
+                        <strong>Account No : </strong> {accountsData.accountId}
                       </li>
 
                       <li className="list-group-item">
-                        <strong>Account Type : </strong>Savings
+                        <strong>Balance : </strong> {accountsData.balance}
                       </li>
 
                       <li className="list-group-item">
-                        <strong>Status : </strong>Active
+                        <strong>Account Type : </strong> {accountsData.accountType}
                       </li>
 
                       <li className="list-group-item">
-                        <strong>Created On : </strong>12/12/2024
+                        <strong>Status : </strong> {accountsData.status}
+                      </li>
+
+                      <li className="list-group-item">
+                        <strong>Created On : </strong>   {formatDateFromEpochForCreatedOn(accountsData.createdOn)}
                       </li>
                     </ul>
                   </div>
@@ -133,13 +227,13 @@ const ViewSpecificAccountDetails = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {transactions.map((transaction, index) => (
+                      {allTransactions.map((transaction, index) => (
                         <tr key={index}>
-                          <td>{transaction.date}</td>
-                          <td>{transaction.description}</td>
+                          <td>{formatDateFromEpoch(transaction.transactionTime)}</td>
+                          <td>{transaction.narration}</td>
                           <td
                             className={
-                              transaction.type === "Credit"
+                              transaction.type === "CREDIT" || "DEPOSIT"
                                 ? "text-success"
                                 : "text-danger"
                             }

@@ -10,14 +10,19 @@ import lombok.Setter;
 @NoArgsConstructor 
 @AllArgsConstructor
 public class BankRespDto {
-/*Bank Name	IFSC	Address	Phone No	Email	Website	Country*/
+
+	/*Bank Name	IFSC	Address	Phone No	Email	Website	Country*/
 	private String BankName;
-	private String IfscCode;
+	private String bankIfsc;
 	private String Address;
 	private String PhoneNo;
 	private String email;
 	private String website;
 	private String country;
-	
+	public BankRespDto(String bankName, String bankIfsc) {
+		super();
+		BankName = bankName;
+		this.bankIfsc = bankIfsc;
+	}
 	
 }

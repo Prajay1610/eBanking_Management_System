@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bank.dtos.ApiResponse;
+import com.bank.dtos.BankAccountRespDto;
 import com.bank.dtos.TransactionResponseDto;
 import com.bank.services.CustomerService;
 
@@ -24,13 +25,15 @@ public class CustomerController {
 	private CustomerService customerService;
 	
 
+	
+	
 
-	@GetMapping("/{customerId}/{accountId}")
-	public ResponseEntity<?> getCustomerDetails(@PathVariable Long customerId,@PathVariable Long accountId){
+	@GetMapping("/{customerId}")
+	public ResponseEntity<?> getCustomerDetails(@PathVariable Long customerId){
 		try {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(
-							customerService.getCustomerDetails(customerId,accountId));
+							customerService.getCustomerDetails(customerId));
 					
 		} catch (RuntimeException e) {
 			return ResponseEntity.
@@ -39,11 +42,29 @@ public class CustomerController {
 		}
 	}
 	
-	@GetMapping("/transactions")
-    public ResponseEntity<List<TransactionResponseDto>> getAllTransactions(
-            @RequestParam(required = false) Long userId) {
-        List<TransactionResponseDto> transactions = customerService.getAllTransactions(userId);
+	
+	@GetMapping("/transactions/{accountId}")
+    public ResponseEntity<List<TransactionResponseDto>> getAllTransactionsForAccount(
+            @PathVariable Long accountId) {
+        List<TransactionResponseDto> transactions = customerService.getAllTransactions(accountId);
         return ResponseEntity.ok(transactions);
     }	
+
+	
+	@GetMapping("/transactions/customer/{customerId}")
+    public ResponseEntity<List<TransactionResponseDto>> getAllTransactionsForCustomer(
+            @PathVariable Long customerId) {
+        List<TransactionResponseDto> transactions = customerService.getAllTransactionsForCustomer(customerId);
+        return ResponseEntity.ok(transactions);
+    }	
+	
+	@GetMapping("/allAccounts/{customerId}")
+	public ResponseEntity<?>  getAllSpecificAccounts(@PathVariable Long customerId) {
+		List<BankAccountRespDto>allAccounts=customerService.getAllSpecificAccounts(customerId);
+        return ResponseEntity.ok(allAccounts);
+
+		
+	}
+	
 
 }

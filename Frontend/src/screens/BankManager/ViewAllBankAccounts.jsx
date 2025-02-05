@@ -68,7 +68,7 @@ const ViewAllBankAccounts = () => {
   };
 
   const viewAccountDetails = (accountId) => {
-    navigate(`/customer/bank/account/detail/${accountId}`);
+    navigate(`/ManageBankAccount/${accountId}`);
   };
 
   const viewAccountStatement = (accountId) => {

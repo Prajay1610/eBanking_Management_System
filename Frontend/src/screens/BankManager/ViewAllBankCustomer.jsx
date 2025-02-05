@@ -50,8 +50,9 @@ const ViewAllBankCustomers = () => {
   useEffect(() => {
     getAllBankCustomers(managerId);
   }, []);
-  const viewCustomerDetails = () => {
-    navigate(`/customerProfile`);
+  const viewCustomerDetails = (customerId) => {
+    navigate(`/customerProfile/${customerId}`);
+
   };
 
   const searchBankCustomersByName = (e) => {
@@ -168,7 +169,7 @@ const ViewAllBankCustomers = () => {
                     <th scope="col">Address</th>
                     <th scope="col">Status</th>
                    
-                    <th scope="col">Account Details</th>
+                    <th scope="col">view customer profile</th>
                     <th scope="col">Action</th>
                     
                   </tr>
@@ -201,7 +202,7 @@ const ViewAllBankCustomers = () => {
                             //onClick={() => viewAccountDetails(customer)}
                             className="btn btn-sm btn-primary mx-2"
                             style={{ backgroundColor: "#544892", border: "none" }}
-                            onClick={() => viewCustomerDetails()}
+                            onClick={() => viewCustomerDetails(customer.customerId)}
                           >
                            
                     View Customer Profile

@@ -20,6 +20,7 @@ export const getBankAccountDetails = async (accountId) => {
     try {
         const response = await axios.get(url);
         console.log("response", response.data);
+        
         return response.data;
     } catch (error) {
         toast.error("Error while retrieving bank account details:", error);

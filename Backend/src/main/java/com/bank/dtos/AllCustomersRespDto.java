@@ -22,12 +22,13 @@ public class AllCustomersRespDto {
 	private String customerAddress;
 	private Long accountId;
 	private boolean customerStatus;
+	public Long customerId;
 	
 private Long userId;
 	
 	
 	public AllCustomersRespDto(String customerName, String bankName, String customerEmail, Gender gender,
-			String customerContact, String customerAddress, Long accountId, boolean customerStatus,Long userId ) {
+			String customerContact, String customerAddress, Long accountId, boolean customerStatus,Long userId,Long customerId ) {
 		super();
 		this.customerName = customerName;
 		this.bankName = bankName;
@@ -38,6 +39,7 @@ private Long userId;
 		this.accountId = accountId;
 		this.customerStatus = customerStatus;
 		this.userId=userId;
+		this.customerId=customerId;
 		
 	}
 	@Override

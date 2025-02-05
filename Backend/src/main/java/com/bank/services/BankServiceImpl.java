@@ -97,7 +97,7 @@ public class BankServiceImpl implements BankService{
 	private Long accountId;
 	private boolean customerStatus;
 	*/
-		return allBankAccounts.stream().map(acc->new AllCustomersRespDto(acc.getCustomer().getUser().getFname()+" "+acc.getCustomer().getUser().getLname(), acc.getBank().getBankName(),acc.getCustomer().getUser().getEmail(),acc.getCustomer().getUser().getGender(),acc.getCustomer().getUser().getPhoneNo(),acc.getCustomer().getUser().getAddress(),acc.getId(),acc.getCustomer().getUser().getIsActive(),acc.getCustomer().getUser().getId())).distinct().toList();
+		return allBankAccounts.stream().map(acc->new AllCustomersRespDto(acc.getCustomer().getUser().getFname()+" "+acc.getCustomer().getUser().getLname(), acc.getBank().getBankName(),acc.getCustomer().getUser().getEmail(),acc.getCustomer().getUser().getGender(),acc.getCustomer().getUser().getPhoneNo(),acc.getCustomer().getUser().getAddress(),acc.getId(),acc.getCustomer().getUser().getIsActive(),acc.getCustomer().getUser().getId(),acc.getCustomer().getId())).distinct().toList();
 		
 		
 	}

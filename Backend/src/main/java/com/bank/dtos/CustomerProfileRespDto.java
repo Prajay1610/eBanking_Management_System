@@ -18,21 +18,21 @@ import lombok.Setter;
 public class CustomerProfileRespDto {
 	private String name;
 	private String email;
-	private AccountType accountType;
-	private BigDecimal accountBalance;
+	
 	private Gender gender;
 	private String contactNo;
 	private String Address;
-	public CustomerProfileRespDto(String name, String email, AccountType accountType, BigDecimal accountBalance,
-			Gender gender, String contactNo, String address) {
+	private Long customerId;
+	public CustomerProfileRespDto(String name, String email,
+			Gender gender, String contactNo, String address,Long customerId ) {
 		super();
 		this.name = name;
 		this.email = email;
-		this.accountType = accountType;
-		this.accountBalance = accountBalance;
+		
 		this.gender = gender;
 		this.contactNo = contactNo;
 		Address = address;
+		this.customerId=customerId;
 	}
 	
 //	private List<Transaction> lastThreeTransactions;

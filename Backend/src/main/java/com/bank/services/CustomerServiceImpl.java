@@ -1,6 +1,7 @@
 package com.bank.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,29 +35,29 @@ public class CustomerServiceImpl implements CustomerService{
 	private BankAccountRepository bankAccountRepository;
 	
 	@Override
-	public CustomerProfileRespDto getCustomerDetails(Long customerId,Long accountId) {
+	public CustomerProfileRespDto getCustomerDetails(Long customerId) {
 		Customer cust = customerRepository.findById(customerId).orElseThrow(()->new ResourceNotFoundException("Can't Find Customer with id: "+customerId));
-		
 		Customer customer = cust;
 		String customerName = customer.getUser().getFname()+" "+customer.getUser().getLname();
 		String email = customer.getUser().getEmail();
 		
-		Optional<BankAccount> account = bankAccountRepository.findById(accountId);
-		BankAccount bankAccount = account.get();
-		AccountType accountType = bankAccount.getAccountType();
-		BigDecimal balance = bankAccount.getBalance();
+		
+
+		
 		String PhoneNo = customer.getUser().getPhoneNo();
 		Gender gender = customer.getUser().getGender();
 		String Address = customer.getUser().getAddress();
+		Long customerId1=customer.getId();//for testing
+		
 		//get account type for a customer's account
-		return new CustomerProfileRespDto(customerName,email,accountType,balance,gender,PhoneNo,Address);
+		return new CustomerProfileRespDto(customerName,email,gender,PhoneNo,Address,customerId1);
 	}
 
 	@Autowired
     private TransactionRepository transactionRepository;
 
-	public List<TransactionResponseDto> getAllTransactions(Long userId) {
-	    return transactionRepository.findAllByAccountId(userId)
+	public List<TransactionResponseDto> getAllTransactions(Long accountId) {
+	    return transactionRepository.findAllByAccountId(accountId)
 	            .stream()
 	            .map(this::convertToDto) // Convert each entity to DTO
 	            .collect(Collectors.toList());
@@ -84,5 +85,51 @@ public class CustomerServiceImpl implements CustomerService{
         return dto;
     }
 
+	
+	@Override
+	public List<TransactionResponseDto> getAllTransactionsForCustomer(Long customerId) {
+	    // Fetch all bank accounts of the given customer
+	    List<BankAccount> allAccounts = bankAccountRepository.findByCustomerId(customerId);
 
+	    // Fetch transactions for all accounts
+	    return allAccounts.stream()
+	            .flatMap(account -> transactionRepository.findAllByAccountId(account.getId()).stream())
+	            .map(this::convertToDto) // Convert each entity to DTO
+	            .collect(Collectors.toList());
+	}
+
+	
+	@Override
+	public List<BankAccountRespDto> getAllSpecificAccounts(Long customerId) {
+	    // Fetch all bank accounts for the given customer
+	    List<BankAccount> allAccounts = bankAccountRepository.findByCustomerId(customerId);
+	    
+	    return allAccounts.stream()
+	            .map(account -> {
+	                // Convert Bank to BankRespDto
+	                BankRespDto bankRespDto = new BankRespDto(
+	                        account.getBank().getBankName(),
+	                        account.getBank().getBankIfsc() // assuming ifscCode is part of the Bank entity
+	                );
+
+	                // Create BankAccountRespDto
+	                BankAccountRespDto respDto = new BankAccountRespDto();
+	                respDto.setCustomerName(account.getCustomer().getUser().getFname() + " " + account.getCustomer().getUser().getLname());
+	                respDto.setBankName(bankRespDto.getBankName());
+	                respDto.setAccountId(account.getId());
+	                respDto.setIfscCode(account.getBank().getBankIfsc());
+	                respDto.setAccountType(account.getAccountType().name());
+	                respDto.setStatus(account.getIsLocked() ? "Locked" : "Active");
+	                respDto.setCustomerEmail(account.getCustomer().getUser().getEmail());
+	                respDto.setBalance(account.getBalance());
+	                respDto.setCreatedOn(account.getCreatedOn());
+
+	                return respDto;
+	            })
+	            .collect(Collectors.toList());
+	}
+
+
+
+    
 }
